@@ -5,6 +5,8 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Document</title>
+        
+        <link rel="stylesheet" href="https://cdn.aerisapi.com/sdk/js/latest/aerisweather.css">
         <link href='https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.css' rel='stylesheet' />
         <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-directions/v4.1.0/mapbox-gl-directions.css" type="text/css">
         <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.7.2/mapbox-gl-geocoder.css" type="text/css">
@@ -15,36 +17,41 @@
         <div class="container">
             <div class="header">
                 <div class="icon-container">
-                    
+                    <div id="icon"></div>
                 </div>
             </div>
             <div class="content">
                 <div class="general-information">
-                    <div class="location" data-location>Location</div>
+                    <div class="location" id="location">Location</div>
                 </div>
             </div>
             <div id="city-search-container">
-                <input type="text" class="city-search" placeholder="Enter Location" data-city-search>
+                <!-- <input type="text" placeholder="Enter Location" id="geocoder" class="geocoder"> -->
+                <div id="geocoder" class="geocoder"></div>
             </div>
             <div class="detail-section">
                 <div class="detail">
                     <div class="title">Temperature</div>
-                    <div class="value" data-temperature>--</div>
+                    <div class="value" id="temperature">--</div>
                 </div>
                 <div class="detail">
-                    <div class="title">Cloud Cover</div>
-                    <div class="value" data-cloud-cover>--</div>
+                    <div class="title">Status</div>
+                    <div class="value" id="status">--</div>
                 </div>
                 <div class="detail">
-                    <div class="title">Weather Status</div>
-                    <div class="value" data-status>--</div>
+                    <div class="title">Humidity</div>
+                    <div class="value" id="humidity">--</div>
                 </div>
             </div>
         </div>
         <div class="map-container">
             <div id="map"></div>
         </div>
+        
         <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.24.0/axios.min.js" integrity="sha512-u9akINsQsAkG9xjc1cnGF4zw5TFDwkxuc9vUp5dltDWYCSmyd0meygbvgXrlc/z7/o4a19Fb5V0OUE58J7dcyw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+        <script type="text/javascript" src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+        <script src="https://cdn.aerisapi.com/sdk/js/latest/aerisweather.min.js"></script>
         <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.7.2/mapbox-gl-geocoder.min.js"></script>
         <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-directions/v4.1.0/mapbox-gl-directions.js"></script>
         <script src='https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.js'></script>
