@@ -1,8 +1,5 @@
 window.addEventListener('load', () => {
 
-    CLIENT_ID = zCfrYllISK6ZDa81GnpVS;
-    CLIENT_SECRET = t1UBi1U14GtUd40ixzqOtLO8uJkJaPD3hhH9e8N5;
-
     const aeris = new AerisWeather('[CLIENT_ID]', '[CLIENT_SECRET]');
 
     const request = aeris.api()
@@ -10,7 +7,7 @@ window.addEventListener('load', () => {
         .place(':auto')
         .format('json')
         .plimit(1)
-        .filter(1min);
+        .filter(1);
     request.get().then((result) => {
         console.log(result);
     });

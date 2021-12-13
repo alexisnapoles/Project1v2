@@ -70,7 +70,7 @@ function setupMap(center) {
 }; 
 
 // const forecast = (latitude, longitude, callback) => {
-//     const url = `http://api.weatherstack.com/current?access_key=cf1786a6ea91cd1a6489b9179560e347d&query=${latitude},${longitude}`;
+//     const url = `http://api.weatherstack.com/current?access_key=WEATHERMAP_APIKEYd&query=${latitude},${longitude}`;
 
 //     request({ url, json: true }, (error, response) => {
 //         if (error) {
