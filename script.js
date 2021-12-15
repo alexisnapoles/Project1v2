@@ -1,89 +1,102 @@
-mapboxgl.accessToken = MAPBOX_ACCESS_TOKEN;
+// Set up Map
+let startPosition = [14.5546336, 121.015680];
+let startZoom = 13;
 
-navigator.geolocation.getCurrentPosition(successLocation, errorLocation, {
-    enableHighAccuracy: true
-});
+const map = L.map('map').setView(startPosition, startZoom);
 
-function successLocation(position) {
-    setupMap([position.coords.longitude, position.coords.latitude])
-};
+L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', 
+    {
+    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+    maxZoom: 21,
+    id: 'mapbox/dark-v10',
+    accessToken: MAPBOX_ACCESS_TOKEN
+    }).addTo(map);
+
+// Whenever map stops moving, load new weather for new location
+map.on('moveend', () => {
+    getTiles()
+})
 
 
-function errorLocation() {
-    setupMap([121.015680, 14.5546336])
-};
+const key = WEATHERMAP_API;
+const searchElement =  document.querySelector('input');
 
+getTiles = () => {
+    // remove existing tiles before new start
+    // removeTiles()
+    let lat = map.getCenter().lat;
+    let lng = map.getCenter().lng;
 
-function setupMap(center) {
-    const map = new mapboxgl.Map({
-    container: 'map', // container ID
-    style: 'mapbox://styles/mapbox/streets-v11', // style URL
-    center: center, // starting position [lng, lat]
-    zoom: 13 // starting zoom
+    // OpenWeatherMap API
+    let getWeatherData = 'https://api.openweathermap.org/data/2.5/weather?lat=' + lat.toFixed(6) + '&lon=' + lng.toFixed(6) + '&appid=' + key;
+        fetch(getWeatherData)
+            .then(resp => { return resp.json() }) // Convert data to json
+            .then(data => {
+                // console.log(data);
+                const celsius = Math.round(parseFloat(data.main.temp) - 273.15);
+                const icon = data.weather[0].icon;
+                let iconSrc = `http://openweathermap.org/img/wn/${icon}.png`;
+
+                document.querySelector('#description').innerHTML = data.weather[0].description;
+                document.querySelector('#temperature').innerHTML = celsius + '&deg;';
+                document.querySelector('#location').innerHTML = data.name;
+                document.querySelector('#icon').innerHTML = `<img src = ${iconSrc}>`;
+
+                if (description.indexOf('rain') > 0) {
+                    document.getElementById('weather-description').className = 'rainy';
+                } else if (description.indexOf('cloud') > 0) {
+                    document.getElementById('weather-description').className = 'cloudy';
+                } else if (description.indexOf('sunny') > 0) {
+                    document.getElementById('weather-description').className = 'sunny';
+                } else if (description.indexOf('clear') > 0) {
+                    document.getElementById('weather-description').className = 'clear';
+                }
+            })
+            .catch(err => {
+                // catch any errors
+                // console.log('There is an error with your request.');
+                // console.log(err);
+            });
+
+}
+getTiles();
+
+let searchResultLayer = L.layerGroup();
+window.addEventListener('DOMContentLoaded', () => {
+    document.querySelector('#search-btn').addEventListener('click', async () => {
+        
+        let query = document.querySelector('#search-box').value;
+        let center = map.getBounds().getCenter();
+        let response = await search(center.lat, center.lng, query);
+        // console.log(response);
+        let searchMarkers = [];
+
+        searchResultLayer.clearLayers();
+
+        let searchResults = document.querySelector('#search-results');
+
+        for (let eachVenue of response.response.venues) {
+            let marker = L.marker([eachVenue.location.lat, eachVenue.location.lng]);
+            marker.bindPopup(`<div><h1>${eachVenue.name}</h1></div>`);
+            marker.addTo(searchResultLayer);
+            searchMarkers.push(marker);
+
+            let resultElement = document.createElement('div');
+            resultElement.innerHTML = eachVenue.name;
+
+            searchResults.appendChild(resultElement);
+
+            resultElement.addEventListener('click', () => {
+                map.flyTo([eachVenue.location.lat, eachVenue.location.lng], 16);
+                marker.openPopup();
+            })
+        }
+        if (!map.hasLayer(searchResultLayer)) {
+            map.addLayer(searchResultLayer);
+        }
     })
+})
+    
 
-    const nav = new mapboxgl.NavigationControl()
-    map.addControl(nav)
 
-    const directions = new MapboxDirections({
-        accessToken: mapboxgl.accessToken
-    })
-    map.addControl(directions, "top-left")
 
-    const geocoder = new MapboxGeocoder({
-        // Initialize the geocoder
-        accessToken: mapboxgl.accessToken, // Set the access token
-        mapboxgl: mapboxgl, // Set the mapbox-gl instance
-        marker: true, // Do not use the default marker style
-        types: 'country,region,place,postcode,locality,neighborhood,poi',
-        placeholder: 'Enter Location',
-        flyTo: {
-            bearing: 0,
-            // Control the flight curve, making it move slowly and
-            // zoom out almost completely before starting to pan.
-            speed: 0.2, // Make the flying slow.
-            curve: 1, // Change the speed at which it zooms out.
-            // This can be any easing function: it takes a number between
-            // 0 and 1 and returns another number between 0 and 1.
-            easing: function (t) {
-                return t;
-            }
-        },    
-    });
-    document.querySelector('#geocoder').appendChild(geocoder.onAdd(map));
-
-    map.on('load', function () {
-        map.addSource('single-point', {
-            type: 'geojson',
-            data: {
-                type: 'FeatureCollection',
-                features: []
-            }
-        });
-
-    geocoder.on('result', function (features){
-        console.log(features.result)
-        // map.getSource('single-point').setData(features.result.geometry);
-        // document.querySelector('#location').innerHTML = features.result.text
-    })
-});
-}; 
-
-// const forecast = (latitude, longitude, callback) => {
-//     const url = `http://api.weatherstack.com/current?access_key=WEATHERMAP_APIKEYd&query=${latitude},${longitude}`;
-
-//     request({ url, json: true }, (error, response) => {
-//         if (error) {
-//             callback("Unable to connect to weather service", undefined);
-//         } else if (response.body.error) {
-//             callback("Unable to find location", undefined);
-//         } else {
-//             const { temperature, humidity, weather_descriptions } = response.body.current;
-//             // document.querySelector('#location').innerText = temperature;
-//             // document.querySelector('#status').innerText = weather_descriptions;
-//             // document.querySelector('#humidity').innerText = humidity;
-//             const data = `Current Temperature is: ${temperature} degree. Feels like ${feelslike} degree.\nWeather description: ${weather_descriptions[0]}`;
-//             callback(undefined, data);
-//         }
-//     });
-// };
