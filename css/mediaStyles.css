@@ -1,0 +1,17 @@
+
+
+@media (min-width: 768px) {
+    * {
+        padding:0;
+        margin: 0;
+    }
+    #search-container {
+        display: block;
+    }
+    #toggle-search-btn {
+        position: absolute;
+        left: 50px;
+        top: 10px;
+        z-index: 314159;
+    }
+}

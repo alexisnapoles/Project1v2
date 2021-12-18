@@ -1,0 +1,18 @@
+* {
+    font-family: Montserrat, sans-serif;
+    padding: 0em;
+}
+
+.bi-grid {
+    color: orange;
+}
+
+#map {
+    height: 80vh;
+    width: 100vw;
+    padding: 0;
+}
+
+#filed-search-result {
+    max-height: 100px;
+}
