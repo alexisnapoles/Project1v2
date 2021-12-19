@@ -1,58 +1,6 @@
-
-function main () {
-    let map;
-    
-    function init() {
-        map = initMap();
-        
-        let searchResult = L.layerGroup();
-        let searchMarkers = []
-        let searchResultBox = document.querySelector('#filed-search-result')
-
-            // when window loaded
-            window.addEventListener('DOMContentLoaded', async () => {
-            
-       
-            // trigger button for books category
-            document.querySelector('#books').addEventListener('click', async ()=>{
-                let bookCategory = 'commercial.books';
-                let bookResults = await getPlacesData(bookCategory);
-                let bookArray = bookResults.features.length
-
-                searchResult.clearLayers();
-                let index = 0
-                for (let book in bookArray) {
-                    let marker = L.marker([book.geometry.coordinates[0], book.geometry.coordinates[1]])
-                    marker.bindPopup(`<div><h1>${book[index].name}</h1></div>`);
-                    marker.addTo(searchResult);
-                    searchMarkers.push(marker);
-
-                    let resultElement = document.createElement('div');
-                    resultElement.innerHTML = book.name;
-                        resultElement.addEventListener('click', () => {
-                            map.flyTo([book.geometry.coordinates[0], book.geometry.coordinates[1]], 16);
-                            marker.openPopup
-                        })
-                        searchResultBox.appendChild(resultElement);
-                if (!map.hasLayer(searchResult)) {
-                    map.addLayer(searchResult);
-                }
-                
-                }
-            })
-            
-            
-        })
-    }
-    init();
-    
-}
-
-// ========================= CATEGORY LAYERS ========================
-
 function initMap() {
     let startPosition = [14.5546336, 121.015680];
-    let map = L.map('map');
+    map = L.map('map');
     map.setView(startPosition, 10);
 
     // setup tilelayer
@@ -64,52 +12,135 @@ function initMap() {
         zoomOffset: -1,
         accessToken: MAPBOX_ACCESS_TOKEN
     }).addTo(map);
-
 }
-main();
+initMap();
 
-// let searchResult = L.layerGroup();
-// let searchMarkers = []
-// let searchResultBox = document.querySelector('#filed-search-result')
-// // MY FUNCTIONS FROM BUTTON ON CLICK EVENT REF: INDEX.HTML
+/* ======================================== MAP LAYERS ====================================== */
+let booksLayer = L.layerGroup();
+let cafeLayer = L.layerGroup();
+
+/* ============= BOOKS CAT ================= */
+// this section assigns a function that allows retrieval of json file for books
+async function retriveBooksData() {
+    let bCategory = 'commercial.books';
+    let booksResults = await getPlacesData(bCategory);
+    // console.log(booksResults);
+    let booksArray = booksResults.features
+    // return booksArray = features array;
+
+    // empty array that will store data information
+    let bSearchMarkers = [];
+
+    // clears previous search results
+    booksLayer.clearLayers();
+
+    let bResults = document.querySelector('#booksSearchResult');
+
+    // pull out important objects or data from the retrieved apikey
+    for (let b of booksArray) {
+        // assigning of variables to store json objects 
+        // let bookPoint = [b.geometry.coordinates[0], b.geometry.coordinates[1]];
+        let bPointName = b.properties.name;
+        let bPointAddress = b.properties.formatted
+        let bdataSource = b.properties.datasource.attribution
+        // logs array of coordinates per data featurearray
+        // console.log(bPointName);
+
+        // markers layer
+        let bookMarker = L.marker([b.geometry.coordinates[1], b.geometry.coordinates[0]]);
+        bookMarker.bindPopup(`
+        <div><h1>${bPointName}</h1></div>
+        <br />
+        <div><h3>${bPointAddress}</h3></div>
+        <br />
+        <div><h3>${bdataSource}</h3></div>
+        `);
+        bookMarker.addTo(booksLayer);
+        bSearchMarkers.push(bookMarker);
+
+        // results are displayed in the appended Child node
+        let bResultsElement = document.createElement('div');
+        bResultsElement.innerHTML = bPointName;
+        bResultsElement.addEventListener('click', () => {
+            map.flyTo([b.geometry.coordinates[1], b.geometry.coordinates[0]], 15);
+            bookMarker.openPopup();
+        })
+        bResults.appendChild(bResultsElement);
+    }
+    return;  
+}
+
+/* ============= CAFE CAT ================= */
+async function retriveCafeData() {
+    let cCategory = 'catering.cafe';
+    let cafeResults = await getPlacesData(cCategory);
+    let cafeArray = cafeResults.features;
+    let cSearchMarkers = [];
+
+    cafeLayer.clearLayers();
+
+    let cResults = document.querySelector('#cafeSearchResult');
+
+    for (let c of cafeArray) {
+        let cPointName = c.properties.name;
+        let cPointAddress = c.properties.formatted
+        let cdataSource = c.properties.datasource.attribution
+
+        let cafeMarker = L.marker([c.geometry.coordinates[1], c.geometry.coordinates[0]]);
+        cafeMarker.bindPopup(`
+        <div><h1>${cPointName}</h1></div>
+        <br />
+        <div><h3>${cPointAddress}</h3></div>
+        <br />
+        <div><h3>${cdataSource}</h3></div>
+        `);
+        cafeMarker.addTo(cafeLayer);
+        cSearchMarkers.push(cafeMarker);
+
+        let cResultsElement = document.createElement('div');
+        cResultsElement.innerHTML = cPointName;
+        cResultsElement.addEventListener('click', () => {
+            map.flyTo([c.geometry.coordinates[1], c.geometry.coordinates[0]], 15);
+            cafeMarker.openPopup();
+        })
+        cResults.appendChild(cResultsElement);
+    }
+    return;
+}
+
+/* ============= ADDING BOOKS AND CAFE LAYERS TO MAP ================= */
+async function addMapLayers(){
+    await retriveBooksData();
+    await retriveCafeData();
+    console.log('addMapLayers; Before layer is added');
+    let baseLayers = {
+        'Book Stores': booksLayer,
+        'Cafe': cafeLayer,
+    }
+    L.control.layers(baseLayers).addTo(map);
+    console.log('addMapLayers; After layer is added');
+}
+
+window.addEventListener('DOMContentLoaded', async (e) => {
+    addMapLayers();
+    console.log('all function code: after map layer done')
+})
+
+/* ======================================== END OF SCRIPT =========================================  */
 
 
-// async function myFunction2() {
-//     // alert('you called function with arguments: 2 ' + val);
-//     const cafeCategory = 'catering.cafe';
-//     let cafeResults = await getPlacesData(cafeCategory);
-//     // console.log(cafeResults);
-//     searchResult.clearLayers();
-//     let cafeArray = cafeResults.features
-//     for (let index = 0; index < cafeArray.length; index++) {
-//         // console.log(cafeArray[index].geometry.coordinates);
-//         let marker = L.marker([cafeArray[index].geometry.coordinates[1], cafeArray[index].geometry.coordinates[0]])
-//         marker.bindPopup(`<div><h1>${cafeArray[index].name}</h1></div>`);
-//         marker.addTo(searchResult);
-//         searchMarkers.push(marker);
-
-//         let resultElement = document.createElement('div');
-//         resultElement.innerHTML = cafeArray[index].name;
-//         resultElement.addEventListener('click', () => {
-//             map.flyTo([cafeArray[index].geometry.coordinates[1], cafeArray[index].geometry.coordinates[0]], 16);
-//             marker.openPopup
-//         })
-//         searchResultBox.appendChild(resultElement);
-//     }
-// }
-
-// // create function for category filtering: 
-// function myFunction(button) {
-//     let x = button.id;
-//     switch (x) {
-//         case 'bks':
-//             myFunction1(x);
-//             break;
-//         case 'caf':
-//             myFunction2(x);
-//             break;
-//         default:
-//             return false;
-//     }
-// }
-
+/* ============================================ NOTES ============================================= */
+/* 
+# IMPORTANT NOTE:
+    ## All codes are attributed to the following:
+        >>>>>> Map App Lab,
+        >>>>>> Documentations,
+        >>>>>> Stackoverflow, etc.
+    ## Future improvements:
+        >>>>>> layout,
+        >>>>>> functionality of button,
+        >>>>>> more interactive layers that the user might find useful
+    ## Additionals:
+        >>>>>> reiterate
+*/
+/* ======================================== END OF NOTES ========================================= */

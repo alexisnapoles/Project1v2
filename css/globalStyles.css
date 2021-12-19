@@ -12,7 +12,8 @@
     width: 100vw;
     padding: 0;
 }
-
-#filed-search-result {
-    max-height: 100px;
-}
+/* 
+#booksSearchResult {
+    max-height: 150px; */
+    /* display: none;
+} */
