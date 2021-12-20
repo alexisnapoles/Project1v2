@@ -1,4 +1,4 @@
-# # Project1v2: BooksAndCafe Map Locator
+# Project1v2: BooksAndCafe Map Locator
 ## PROJECT NAME AND SUMMARY
 - Describe the context of your project
 - Describe the user goals and the organisation's goals
@@ -35,7 +35,10 @@
 ## TECHNOLOGIES USESD
 - Provide an overview of the **languages**, **frameworks**, and **other tools** used in the project.
 - Be **sure** to provide a *short description* **where in the project the technology is used** and a **URL to its Github repository**
-	* [Bootstrap](https://github.com/twbs/bootstrap)
+	* HTML5
+	* CSS
+	* Bootstrap
+	* Vanilla JavaScript
 
 ## TESTING
 - You can provide **step-by-step instructions** for the examiner to test the project.
@@ -51,7 +54,11 @@
 - **If you used a piece of code from external website, acknowledge and provide link**
 - Libraries:
 	* [Leaflet](https://github.com/Leaflet/Leaflet)
-  * [Leaflet](https://github.com/Leaflet/Leaflet)
+	* [Mapbox](https://www.mapbox.com/)
+	* [Geoapify](https://www.geoapify.com/)
+	* [OpenWeatherMap](https://openweathermap.org/current)
+	* [Sir Paul's Leaflet Repo](https://github.com/kunxin-chor/tgc11-leaflet-maps)
+	* [DWAD TGC15 Map App Lab](https://drive.google.com/file/d/1dLzokjuerdU6ptou3uarnsp5wEmHoenc/view)
 	
 ## DISCLAIMER
 Contents of this repository may have been obtained from open sources and that the creator acknwoledges that not all content is not original.
